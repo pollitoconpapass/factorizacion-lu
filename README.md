@@ -113,3 +113,12 @@ const PT = ... // transpuesta de P
 ```
 - Calculamos la transpuesta de P para obtener P^T.
 
+
+### Ejemplo con Matriz 3x3
+![alt text](public/matriz3x3-1.png)
+
+![alt text](public/matriz3x3-2.png)
+
+
+## 🙈 Demo Proyecto
+ ![alt text](public/demo.png)
