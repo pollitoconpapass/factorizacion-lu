@@ -34,8 +34,11 @@ const LUFactorizationApp = () => {
   // Actualizar valor de celda
   const updateMatrixValue = (row, col, value) => {
     const newMatrix = copyMatrix(matrix);
-    newMatrix[row][col] = parseFloat(value) || 0;
-    setMatrix(newMatrix);
+    // Only update if the value is a valid number or empty string
+    if (value === '' || !isNaN(Number(value))) {
+      newMatrix[row][col] = value === '' ? 0 : Number(value);
+      setMatrix(newMatrix);
+    }
   };
 
 
@@ -173,8 +176,19 @@ const LUFactorizationApp = () => {
                     <input
                       key={j}
                       type="number"
-                      value={val}
+                      value={matrix[i][j]}
                       onChange={(e) => updateMatrixValue(i, j, e.target.value)}
+                      onFocus={(e) => {
+                        e.target.select();
+                        if (e.target.value === '0') {
+                          e.target.value = '';
+                        }
+                      }}
+                      onBlur={(e) => {
+                        if (e.target.value === '') {
+                          e.target.value = '0';
+                        }
+                      }}
                       className="w-16 h-12 text-center border-r border-b border-gray-200 text-sm focus:outline-none focus:bg-blue-50"
                       step="0.1"
                     />
