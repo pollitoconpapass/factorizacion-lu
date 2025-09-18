@@ -4,6 +4,7 @@ import {
   copyMatrix, 
   luFactorization, 
   pluFactorization, 
+  needsPivoting,
   formatNumber 
 } from '../utils/matrixUtils';
 
@@ -53,11 +54,20 @@ const LUFactorizationApp = () => {
       setError('');
       
       if (usePivoting) {
-        const result = pluFactorization(matrix);
-        setResult({
-          type: 'PLU',
-          ...result
-        });
+        if (!needsPivoting(matrix)) {
+          setError('No es necesario usar P^TLU, resolviendo con LU...');
+          const result = luFactorization(matrix);
+          setResult({
+              type: 'LU',
+              ...result
+            });
+        } else {
+          const result = pluFactorization(matrix);
+          setResult({
+            type: 'PLU',
+            ...result
+          });
+        }
       } else {
         const result = luFactorization(matrix);
         setResult({
