@@ -21,20 +21,24 @@ export const swapRows = (mat, row1, row2) => {
 // Factorización LU sin pivoteo
 export const luFactorization = (A) => {
   const n = A.length;
-  const U = copyMatrix(A);
-  const L = createIdentityMatrix(n);
+  const U = copyMatrix(A); // -> crea una copia de la matriz original
+  const L = createIdentityMatrix(n); // -> crea una matriz identidad de tamaño n
 
+  // Verificacion para que no sea muy pequeño el pivote
   for (let i = 0; i < n - 1; i++) {
     if (Math.abs(U[i][i]) < 1e-10) {
       throw new Error(`Elemento diagonal cero en posición (${i+1},${i+1}). Use el método P^TLU.`);
     }
 
+    // 
     for (let j = i + 1; j < n; j++) {
       const factor = U[j][i] / U[i][i];
       L[j][i] = factor;
       
       for (let k = i; k < n; k++) {
-        U[j][k] -= factor * U[i][k];
+        U[j][k] -= factor * U[i][k]; // -> restamos la fila pivote multiplicada por el factor para anular la posición
+        // -> seria como: Fila x = Fila x - factor * Fila y 
+        // Que es igual a... (-factor * Fila y) + Fila x => Fila x
       }
     }
   }
@@ -45,10 +49,10 @@ export const luFactorization = (A) => {
 // Factorización P^TLU con pivoteo
 export const pluFactorization = (A) => {
   const n = A.length;
-  const U = copyMatrix(A);
-  const L = createIdentityMatrix(n);
-  const P = createIdentityMatrix(n);
-  const permutations = [];
+  const U = copyMatrix(A); // -> copia de la original
+  const L = createIdentityMatrix(n); // -> crea una matriz identidad de tamaño n
+  const P = createIdentityMatrix(n); // -> crea una matriz identidad de tamaño n
+  const permutations = []; // -> se guardaran todas las permutaciones (cambios de filas) hechas
 
   for (let i = 0; i < n - 1; i++) {
     // Encontrar el pivote (elemento de mayor valor absoluto)
@@ -60,16 +64,18 @@ export const pluFactorization = (A) => {
     }
 
     // Intercambiar filas si es necesario
-    if (maxRow !== i) {
-      swapRows(U, i, maxRow);
-      swapRows(P, i, maxRow);
-      permutations.push({ from: i, to: maxRow });
+    if (maxRow !== i) { // -> si maxRow es diferente a i, significa que hay que intercambiar filas
+      swapRows(U, i, maxRow); // -> intercambia las filas en U
+      swapRows(P, i, maxRow); // -> intercambia las filas en P
+      permutations.push({ from: i, to: maxRow }); // -> registra la permutación
     }
 
+    // Verificacion para que no sea muy pequeño el pivote
     if (Math.abs(U[i][i]) < 1e-10) {
       throw new Error(`Matriz singular en posición (${i+1},${i+1})`);
     }
 
+    // Aplicar el mismo reemplazo de valores que en LU
     for (let j = i + 1; j < n; j++) {
       const factor = U[j][i] / U[i][i];
       L[j][i] = factor;
