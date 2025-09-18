@@ -46,6 +46,28 @@ export const luFactorization = (A) => {
   return { L, U };
 };
 
+export function needsPivoting(matrix, wall = 1e-10) { // -> wall es el parametro a comparar
+  const n = matrix.length;
+  const A = copyMatrix(matrix);
+
+  for (let k = 0; k < n; k++) {
+    // Verificamos un pivot e en la diagonal de la matriz
+    if (Math.abs(A[k][k]) < wall) {
+      return true;
+    }
+
+    // Eliminar hacia abajo (simulación)
+    for (let i = k + 1; i < n; i++) {
+      const factor = A[i][k] / A[k][k];
+      for (let j = k; j < n; j++) {
+        A[i][j] -= factor * A[k][j];
+      }
+    }
+  }
+
+  return false; // -> no hay ningun pivtoe como 0
+}
+
 // Factorización P^TLU con pivoteo
 export const pluFactorization = (A) => {
   const n = A.length;
