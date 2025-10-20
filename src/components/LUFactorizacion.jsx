@@ -14,15 +14,18 @@ const LUFactorizationApp = () => {
   const [usePivoting, setUsePivoting] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
+  // tipos de mensajes: 'error' (rojo) | 'warning' (amarillo)
+  const [errorType, setErrorType] = useState('error');
 
   // Generar matriz aleatoria
   const generateRandomMatrix = () => {
-    const newMatrix = Array(matrixSize).fill().map(() => 
-      Array(matrixSize).fill().map(() => Math.floor(Math.random() * 20) - 10)
+    const newMatrix = new Array(matrixSize).fill().map(() => 
+      new Array(matrixSize).fill().map(() => Math.floor(Math.random() * 20) - 10)
     );
     setMatrix(newMatrix);
     setResult(null);
     setError('');
+    setErrorType('error');
   };
 
   // Crear matriz vacía para input manual
@@ -30,13 +33,13 @@ const LUFactorizationApp = () => {
     setMatrix(initializeMatrix(matrixSize));
     setResult(null);
     setError('');
+    setErrorType('error');
   };
 
   // Actualizar valor de celda
   const updateMatrixValue = (row, col, value) => {
     const newMatrix = copyMatrix(matrix);
-    // Only update if the value is a valid number or empty string
-    if (value === '' || !isNaN(Number(value))) {
+    if (value === '' || !Number.isNaN(Number(value))) {
       newMatrix[row][col] = value === '' ? 0 : Number(value);
       setMatrix(newMatrix);
     }
@@ -51,20 +54,22 @@ const LUFactorizationApp = () => {
     }
 
     try {
-      setError('');
+  setError('');
+  setErrorType('error');
       
       if (usePivoting) {
-        if (!needsPivoting(matrix)) {
-          setError('No es necesario usar P^TLU, resolviendo con LU...');
-          const result = luFactorization(matrix);
-          setResult({
-              type: 'LU',
-              ...result
-            });
-        } else {
+        if (needsPivoting(matrix)) {
           const result = pluFactorization(matrix);
           setResult({
             type: 'PLU',
+            ...result
+          });
+        } else {
+          setError('No es necesario usar P^TLU, resolviendo con LU...'); // -> warning
+          setErrorType('warning');
+          const result = luFactorization(matrix);
+          setResult({
+            type: 'LU',
             ...result
           });
         }
@@ -77,6 +82,7 @@ const LUFactorizationApp = () => {
       }
     } catch (err) {
       setError(err.message);
+      setErrorType('error');
       setResult(null);
     }
   };
@@ -117,7 +123,7 @@ const LUFactorizationApp = () => {
             </label>
             <select 
               value={matrixSize} 
-              onChange={(e) => setMatrixSize(parseInt(e.target.value))}
+              onChange={(e) => setMatrixSize(Number.parseInt(e.target.value))}
               className="border border-gray-300 rounded px-3 py-2"
             >
               <option value={4}>4x4</option>
@@ -169,7 +175,9 @@ const LUFactorizationApp = () => {
 
       {/* Error */}
       {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+        <div
+          className={`${errorType === 'warning' ? 'bg-yellow-100 border-yellow-400 text-yellow-700' : 'bg-red-100 border-red-400 text-red-700'} px-4 py-3 rounded mb-6`}
+        >
           {error}
         </div>
       )}

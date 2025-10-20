@@ -1,12 +1,12 @@
 // Inicializar matriz vacía
 export const initializeMatrix = (size) => {
-  return Array(size).fill().map(() => Array(size).fill(0));
+  return new Array(size).fill().map(() => new Array(size).fill(0));
 };
 
 // Crear matriz identidad
 export const createIdentityMatrix = (size) => {
-  return Array(size).fill().map((_, i) => 
-    Array(size).fill().map((_, j) => i === j ? 1 : 0)
+  return new Array(size).fill().map((_, i) => 
+    new Array(size).fill().map((_, j) => i === j ? 1 : 0)
   );
 };
 
@@ -103,14 +103,14 @@ export const pluFactorization = (A) => {
       L[j][i] = factor;
       
       for (let k = i; k < n; k++) {
-        U[j][k] -= factor * U[i][k];
+        U[j][k] -= factor * U[i][k]; // -> Fila x = Fila x - factor * Fila y 
       }
     }
   }
 
   // Calcular P^T (transpuesta de P)
-  const PT = Array(n).fill().map((_, i) => 
-    Array(n).fill().map((_, j) => P[j][i])
+  const PT = new Array(n).fill().map((_, i) => 
+    new Array(n).fill().map((_, j) => P[j][i])
   );
 
   return { PT, L, U, P, permutations };
