@@ -79,22 +79,21 @@ export const pluFactorization = (A) => {
   for (let i = 0; i < n - 1; i++) {
     // Encontrar el pivote (elemento de mayor valor absoluto)
     let maxRow = i;
+    let maxVal = Math.abs(U[i][i]);
     for (let k = i + 1; k < n; k++) {
-      if (Math.abs(U[k][i]) > Math.abs(U[maxRow][i])) {
+      if (Math.abs(U[k][i]) > maxVal) {
+        maxVal = Math.abs(U[k][i]);
         maxRow = k;
       }
     }
+
+    if (maxVal < 1e-10) continue;
 
     // Intercambiar filas si es necesario
     if (maxRow !== i) { // -> si maxRow es diferente a i, significa que hay que intercambiar filas
       swapRows(U, i, maxRow); // -> intercambia las filas en U
       swapRows(P, i, maxRow); // -> intercambia las filas en P
       permutations.push({ from: i, to: maxRow }); // -> registra la permutación
-    }
-
-    // Verificacion para que no sea muy pequeño el pivote
-    if (Math.abs(U[i][i]) < 1e-10) {
-      throw new Error(`Matriz singular en posición (${i+1},${i+1})`);
     }
 
     // Aplicar el mismo reemplazo de valores que en LU
