@@ -7,6 +7,7 @@ import {
   needsPivoting,
   formatNumber 
 } from '../utils/matrixUtils';
+import { getSymbolabURL } from '../utils/verifySolution';
 
 const LUFactorizationApp = () => {
   const [matrixSize, setMatrixSize] = useState(4);
@@ -170,6 +171,19 @@ const LUFactorizationApp = () => {
           >
             Resolver Factorización
           </button>
+          {result && (
+            <button
+              onClick={() => {
+                const matrices = result.type === 'PLU' 
+                  ? [result.PT, result.L, result.U]
+                  : [result.L, result.U];
+                window.open(getSymbolabURL(matrices), '_blank');
+              }}
+              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded font-medium"
+            >
+              Verificar
+            </button>
+          )}
         </div>
       </div>
 
