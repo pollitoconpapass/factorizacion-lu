@@ -71,10 +71,10 @@ export function needsPivoting(matrix, wall = 1e-10) { // -> wall es el parametro
 // Factorización P^TLU con pivoteo
 export const pluFactorization = (A) => {
   const n = A.length;
-  const U = copyMatrix(A); // -> copia de la original
-  const L = createIdentityMatrix(n); // -> crea una matriz identidad de tamaño n
-  const P = createIdentityMatrix(n); // -> crea una matriz identidad de tamaño n
-  const permutations = []; // -> se guardaran todas las permutaciones (cambios de filas) hechas
+  const U = copyMatrix(A); // -> crea una copia de la matriz original
+  const L = createIdentityMatrix(n); // -> matriz identidad
+  const P = createIdentityMatrix(n); // -> matriz de permutación (a partir de la identidad)
+  const permutations = [];
 
   for (let i = 0; i < n - 1; i++) {
     // Encontrar el pivote (elemento de mayor valor absoluto)
@@ -90,19 +90,27 @@ export const pluFactorization = (A) => {
     if (maxVal < 1e-10) continue;
 
     // Intercambiar filas si es necesario
-    if (maxRow !== i) { // -> si maxRow es diferente a i, significa que hay que intercambiar filas
-      swapRows(U, i, maxRow); // -> intercambia las filas en U
-      swapRows(P, i, maxRow); // -> intercambia las filas en P
-      permutations.push({ from: i, to: maxRow }); // -> registra la permutación
+    if (maxRow !== i) {
+      swapRows(U, i, maxRow);
+      swapRows(P, i, maxRow);
+      
+      // Solo intercambiar las columnas ya calculadas de L (a la izquierda de la diagonal)
+      for (let k = 0; k < i; k++) {
+        const temp = L[i][k];
+        L[i][k] = L[maxRow][k];
+        L[maxRow][k] = temp;
+      }
+      
+      permutations.push({ from: i, to: maxRow });
     }
 
-    // Aplicar el mismo reemplazo de valores que en LU
+    // Aplicar eliminación gaussiana
     for (let j = i + 1; j < n; j++) {
       const factor = U[j][i] / U[i][i];
       L[j][i] = factor;
       
       for (let k = i; k < n; k++) {
-        U[j][k] -= factor * U[i][k]; // -> Fila x = Fila x - factor * Fila y 
+        U[j][k] -= factor * U[i][k];
       }
     }
   }
